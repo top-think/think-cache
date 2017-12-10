@@ -28,6 +28,8 @@ class File extends Driver
         'data_compress' => false,
     ];
 
+    protected $expire;
+
     /**
      * 架构函数
      * @param array $options
@@ -119,15 +121,17 @@ class File extends Driver
             return $default;
         }
 
-        $content = file_get_contents($filename);
-
+        $content      = file_get_contents($filename);
+        $this->expire = null;
         if (false !== $content) {
             $expire = (int) substr($content, 8, 12);
+
             if (0 != $expire && time() > filemtime($filename) + $expire) {
                 //缓存过期删除缓存文件
                 $this->unlink($filename);
                 return $default;
             }
+            $this->expire = $expire;
 
             $content = substr($content, 32);
             if ($this->options['data_compress'] && function_exists('gzcompress')) {
@@ -192,12 +196,14 @@ class File extends Driver
     public function inc($name, $step = 1)
     {
         if ($this->has($name)) {
-            $value = $this->get($name) + $step;
+            $value  = $this->get($name) + $step;
+            $expire = $this->expire;
         } else {
-            $value = $step;
+            $value  = $step;
+            $expire = 0;
         }
 
-        return $this->set($name, $value, 0) ? $value : false;
+        return $this->set($name, $value, $expire) ? $value : false;
     }
 
     /**
@@ -210,12 +216,14 @@ class File extends Driver
     public function dec($name, $step = 1)
     {
         if ($this->has($name)) {
-            $value = $this->get($name) - $step;
+            $value  = $this->get($name) - $step;
+            $expire = $this->expire;
         } else {
-            $value = -$step;
+            $value  = -$step;
+            $expire = 0;
         }
 
-        return $this->set($name, $value, 0) ? $value : false;
+        return $this->set($name, $value, $expire) ? $value : false;
     }
 
     /**
