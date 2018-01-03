@@ -71,7 +71,7 @@ class Cache
         return self::$handler;
     }
 
-    public function __callStatic($method, $args)
+    public static function __callStatic($method, $args)
     {
         return call_user_func_array([self::init(), $method], $args);
     }
