@@ -13,6 +13,18 @@ namespace think;
 
 use think\cache\Driver;
 
+/**
+ * @method static get($name, $default = false)
+ * @method static set($name, $value, $expire = null)
+ * @method static has($name)
+ * @method static inc($name, $step = 1)
+ * @method static dec($name, $step = 1)
+ * @method static rm($name)
+ * @method static clear($tag = null)
+ * @method static pull($name)
+ * @method static remember($name, $value, $expire = null)
+ * @method static handler()
+ */
 class Cache
 {
     /**
