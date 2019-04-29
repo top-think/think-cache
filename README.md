@@ -35,7 +35,7 @@ Cache::clear();
 // 读取并删除缓存
 Cache::pull('val');
 // 不存在则写入
-Cache::remember('val','value');
+Cache::remember('val',10);
 
 // 对于数值类型的缓存数据可以使用
 // 缓存增+1
@@ -51,8 +51,8 @@ Cache::dec('val',5);
 $redis = Cache::connect([
 	// 驱动方式（支持file/memcache/redis/xcache/wincache/sqlite）
 	'type'   => 'redis',
-        'host'       => '127.0.0.1',
-        'port'       => 6379,
+	'host'   => '127.0.0.1',
+	'port'   => 6379,
 	// 缓存前缀
 	'prefix' => '',
 	// 缓存有效期 0表示永久缓存
@@ -61,8 +61,4 @@ $redis = Cache::connect([
 
 $redis->set('var','value',600);
 $redis->get('var');
-
-// 或者使用
-$redis->val = 'value';
-echo $redis->val;
 ~~~
