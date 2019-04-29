@@ -1,6 +1,6 @@
 # think-cache
 
-用于PHP缓存管理（PHP>5.6+）
+用于PHP缓存管理（PHP 7.1+）
 
 安装
 ~~~
@@ -9,7 +9,7 @@ composer require topthink/think-cache
 
 用法：
 ~~~php
-use think\Cache;
+use think\facade\Cache;
 
 // 缓存初始化
 Cache::init([
