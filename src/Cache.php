@@ -56,7 +56,6 @@ class Cache implements CacheItemPoolInterface
     public function __construct(array $config = [])
     {
         $this->config = $config;
-        $this->init($config);
     }
 
     /**
