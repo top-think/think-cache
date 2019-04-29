@@ -73,10 +73,29 @@ class Cache implements CacheItemPoolInterface
         if ($force || !isset($this->instance[$name])) {
             $type = !empty($options['type']) ? $options['type'] : 'File';
 
-            $this->instance[$name] = App::factory($type, '\\think\\cache\\driver\\', $options);
+            $this->instance[$name] = $this->factory($type, '\\think\\cache\\driver\\', $options);
         }
 
         return $this->instance[$name];
+    }
+
+    /**
+     * 创建工厂对象实例
+     * @access public
+     * @param string $name      工厂类名
+     * @param string $namespace 默认命名空间
+     * @param array  $args
+     * @return mixed
+     */
+    public function factory(string $name, string $namespace = '', ...$args)
+    {
+        $class = false !== strpos($name, '\\') ? $name : $namespace . ucwords($name);
+
+        if (class_exists($class)) {
+            return Container::getInstance()->invokeClass($class, $args);
+        }
+
+        throw new ClassNotFoundException('class not exists:' . $class, $class);
     }
 
     /**
