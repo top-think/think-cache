@@ -35,8 +35,8 @@ class Redis extends Driver
         'expire'     => 0,
         'persistent' => false,
         'prefix'     => '',
-        'serialize'  => true,
         'tag_prefix' => 'tag_',
+        'serialize'  => [],
     ];
 
     /**
@@ -63,9 +63,6 @@ class Redis extends Driver
                 $this->handler->auth($this->options['password']);
             }
 
-            if (0 != $this->options['select']) {
-                $this->handler->select($this->options['select']);
-            }
         } elseif (class_exists('\Predis\Client')) {
             $params = [];
             foreach ($this->options as $key => $val) {
@@ -84,6 +81,10 @@ class Redis extends Driver
             $this->options['prefix'] = '';
         } else {
             throw new \BadFunctionCallException('not support: redis');
+        }
+
+        if (0 != $this->options['select']) {
+            $this->handler->select($this->options['select']);
         }
     }
 
@@ -134,22 +135,15 @@ class Redis extends Driver
             $expire = $this->options['expire'];
         }
 
-        if (!empty($this->tag) && !$this->has($name)) {
-            $first = true;
-        }
-
         $key    = $this->getCacheKey($name);
         $expire = $this->getExpireTime($expire);
-
-        $value = $this->serialize($value);
+        $value  = $this->serialize($value);
 
         if ($expire) {
             $this->handler->setex($key, $expire, $value);
         } else {
             $this->handler->set($key, $value);
         }
-
-        isset($first) && $this->setTagItem($key);
 
         return true;
     }
@@ -192,7 +186,7 @@ class Redis extends Driver
      * @param  string $name 缓存变量名
      * @return bool
      */
-    public function rm(string $name): bool
+    public function delete($name): bool
     {
         $this->writeTimes++;
 
@@ -207,13 +201,6 @@ class Redis extends Driver
      */
     public function clear(): bool
     {
-        if (!empty($this->tag)) {
-            foreach ($this->tag as $tag) {
-                $this->clearTag($tag);
-            }
-            return true;
-        }
-
         $this->writeTimes++;
 
         $this->handler->flushDB();
@@ -223,36 +210,25 @@ class Redis extends Driver
     /**
      * 删除缓存标签
      * @access public
-     * @param  string $tag 缓存标签名
+     * @param  array  $keys 缓存标识列表
      * @return void
      */
-    public function clearTag(string $tag): void
+    public function clearTag(array $keys): void
     {
         // 指定标签清除
-        $keys = $this->getTagItems($tag);
-
         $this->handler->del($keys);
-
-        $tagName = $this->getTagKey($tag);
-        $this->handler->del($tagName);
     }
 
     /**
-     * 更新标签
-     * @access protected
+     * 追加（数组）缓存数据
+     * @access public
      * @param  string $name 缓存标识
+     * @param  mixed  $value 数据
      * @return void
      */
-    protected function setTagItem(string $name): void
+    public function push(string $name, $value): void
     {
-        if (!empty($this->tag)) {
-            foreach ($this->tag as $tag) {
-                $tagName = $this->getTagKey($tag);
-                $this->handler->sAdd($tagName, $name);
-            }
-
-            $this->tag = null;
-        }
+        $this->handler->sAdd($name, $value);
     }
 
     /**
@@ -263,12 +239,7 @@ class Redis extends Driver
      */
     public function getTagItems(string $tag): array
     {
-        $tagName = $this->getTagKey($tag);
-        $keys    = $this->handler->sMembers($tagName);
-
-        return array_map(function ($key) {
-            return $this->getCacheKey($key);
-        }, $keys);
+        return $this->handler->sMembers($tag);
     }
 
 }

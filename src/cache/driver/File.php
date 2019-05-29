@@ -30,8 +30,8 @@ class File extends Driver
         'path'          => '',
         'hash_type'     => 'md5',
         'data_compress' => false,
-        'serialize'     => true,
         'tag_prefix'    => 'tag_',
+        'serialize'     => [],
     ];
 
     /**
@@ -57,12 +57,11 @@ class File extends Driver
 
     /**
      * 取得变量的存储文件名
-     * @access protected
+     * @access public
      * @param  string $name 缓存变量名
-     * @param  bool   $auto 是否自动创建目录
      * @return string
      */
-    protected function getCacheKey(string $name, bool $auto = false): string
+    public function getCacheKey(string $name): string
     {
         $name = hash($this->options['hash_type'], $name);
 
@@ -75,18 +74,7 @@ class File extends Driver
             $name = $this->options['prefix'] . DIRECTORY_SEPARATOR . $name;
         }
 
-        $filename = $this->options['path'] . $name . '.php';
-        $dir      = dirname($filename);
-
-        if ($auto && !is_dir($dir)) {
-            try {
-                mkdir($dir, 0755, true);
-            } catch (\Exception $e) {
-                // 创建失败
-            }
-        }
-
-        return $filename;
+        return $this->options['path'] . $name . '.php';
     }
 
     /**
@@ -158,13 +146,17 @@ class File extends Driver
         }
 
         $expire   = $this->getExpireTime($expire);
-        $filename = $this->getCacheKey($name, true);
+        $filename = $this->getCacheKey($name);
+        $data     = $this->serialize($value);
 
-        if (!empty($this->tag) && !is_file($filename)) {
-            $first = true;
+        $dir = dirname($filename);
+        if (!is_dir($dir)) {
+            try {
+                mkdir($dir, 0755, true);
+            } catch (\Exception $e) {
+                // 创建失败
+            }
         }
-
-        $data = $this->serialize($value);
 
         if ($this->options['data_compress'] && function_exists('gzcompress')) {
             //数据压缩
@@ -175,7 +167,6 @@ class File extends Driver
         $result = file_put_contents($filename, $data);
 
         if ($result) {
-            isset($first) && $this->setTagItem($filename);
             clearstatcache();
             return true;
         }
@@ -229,7 +220,7 @@ class File extends Driver
      * @param  string $name 缓存变量名
      * @return bool
      */
-    public function rm(string $name): bool
+    public function delete($name): bool
     {
         $this->writeTimes++;
 
@@ -247,15 +238,6 @@ class File extends Driver
      */
     public function clear(): bool
     {
-        if (!empty($this->tag)) {
-            // 指定标签清除
-            foreach ($this->tag as $tag) {
-                $this->clearTag($tag);
-            }
-
-            return true;
-        }
-
         $this->writeTimes++;
 
         $files = (array) glob($this->options['path'] . ($this->options['prefix'] ? $this->options['prefix'] . DIRECTORY_SEPARATOR : '') . '*');
@@ -278,18 +260,14 @@ class File extends Driver
     /**
      * 删除缓存标签
      * @access public
-     * @param  string $tag 缓存标签名
+     * @param  array $keys 缓存标识列表
      * @return void
      */
-    public function clearTag(string $tag): void
+    public function clearTag(array $keys): void
     {
-        $keys = $this->getTagItems($tag);
-
         foreach ($keys as $key) {
             $this->unlink($key);
         }
-
-        $this->rm($this->getTagKey($tag));
     }
 
     /**

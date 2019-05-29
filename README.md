@@ -13,7 +13,7 @@ use think\facade\Cache;
 
 // 缓存初始化
 Cache::init([
-	// 驱动方式（支持file/memcache/redis/xcache/wincache/sqlite）
+	// 驱动方式（支持file/memcache/redis/xcache/wincache）
 	'type'   => 'File',
 	// 缓存保存目录
 	//'path'   => './cache/',
@@ -29,7 +29,7 @@ Cache::has('val');
 // 获取缓存
 Cache::get('val');
 // 删除缓存
-Cache::rm('val');
+Cache::delete('val');
 // 清除缓存
 Cache::clear();
 // 读取并删除缓存
@@ -46,6 +46,11 @@ Cache::inc('val',5);
 Cache::dec('val');
 // 缓存减5
 Cache::dec('val',5);
+
+// 使用缓存标签
+Cache::tag('tag_name')->set('val','value',600);
+// 删除某个标签下的缓存数据
+Cache::tag('tag_name')->clear();
 
 // 使用多种缓存类型
 $redis = Cache::connect([

@@ -17,6 +17,7 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use think\cache\CacheItem;
 use think\cache\Driver;
+use think\cache\TagSet;
 
 /**
  * 缓存管理类
@@ -136,25 +137,88 @@ class Cache implements CacheItemPoolInterface
             return $this->connect($this->config[$name], $force);
         }
 
-        return $this->init();
+        return $this->init([], $force);
     }
 
-    public function get(string $key)
+    /**
+     * 读取缓存
+     * @access public
+     * @param  string $key 缓存变量名
+     * @param  mixed  $default 默认值
+     * @return mixed
+     */
+    public function get(string $key, $default = false)
     {
-        return $this->init()->get($key);
+        return $this->init()->get($key, $default);
     }
 
+    /**
+     * 写入缓存
+     * @access public
+     * @param  string        $name 缓存变量名
+     * @param  mixed         $value  存储数据
+     * @param  int|\DateTime $expire  有效时间 0为永久
+     * @return bool
+     */
     public function set(string $name, $value, $expire = null)
     {
         return $this->init()->set($name, $value, $expire);
     }
 
-    public function delete(string $key)
+    /**
+     * 追加缓存
+     * @access public
+     * @param  string $name 缓存变量名
+     * @param  mixed  $value  存储数据
+     * @return void
+     */
+    public function push(string $name, $value): void
     {
-        return $this->init()->rm($key);
+        $this->init()->push($name, $value);
     }
 
-    public function has(string $key)
+    /**
+     * 读取并删除缓存
+     * @access public
+     * @param  string $name 缓存变量名
+     * @return mixed
+     */
+    public function pull(string $name)
+    {
+        return $this->init()->pull($name);
+    }
+
+    /**
+     * 如果不存在则写入缓存
+     * @access public
+     * @param  string $name 缓存变量名
+     * @param  mixed  $value  存储数据
+     * @param  int    $expire  有效时间 0为永久
+     * @return mixed
+     */
+    public function remember(string $name, $value, $expire = null)
+    {
+        return $this->init()->remember($name, $value, $expire);
+    }
+
+    /**
+     * 删除缓存
+     * @access public
+     * @param  string $name 缓存变量名
+     * @return bool
+     */
+    public function delete(string $key): bool
+    {
+        return $this->init()->delete($key);
+    }
+
+    /**
+     * 判断缓存是否存在
+     * @access public
+     * @param  string $name 缓存变量名
+     * @return bool
+     */
+    public function has(string $key): bool
     {
         return $this->init()->has($key);
     }
@@ -162,12 +226,23 @@ class Cache implements CacheItemPoolInterface
     /**
      * 缓存标签
      * @access public
-     * @param  string|array $name 标签名
-     * @return Driver
+     * @param  string $name 标签名
+     * @return TagSet
      */
-    public function tag($name)
+    public function tag(string $name): TagSet
     {
         return $this->init()->tag($name);
+    }
+
+    /**
+     * 返回句柄对象，可执行其它高级方法
+     *
+     * @access public
+     * @return object
+     */
+    public function handler()
+    {
+        return $this->init()->handler();
     }
 
     /**
