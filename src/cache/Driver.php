@@ -166,18 +166,22 @@ abstract class Driver implements CacheInterface
     /**
      * 缓存标签
      * @access public
-     * @param  string $name 标签名
+     * @param  string|array $name 标签名
      * @return $this
      */
-    public function tag(string $name)
+    public function tag($name)
     {
-        if (!isset($this->tag[$name])) {
-            $key = $this->getTagKey($name);
+        $name = (array) $name;
+        $key  = implode('-', $name);
 
-            $this->tag[$name] = new TagSet($key, $this);
+        if (!isset($this->tag[$key])) {
+            $name = array_map(function ($val) {
+                return $this->getTagKey($val);
+            }, $name);
+            $this->tag[$key] = new TagSet($name, $this);
         }
 
-        return $this->tag[$name];
+        return $this->tag[$key];
     }
 
     /**
@@ -188,7 +192,8 @@ abstract class Driver implements CacheInterface
      */
     public function getTagItems(string $tag): array
     {
-        return $this->get($tag, []);
+        $name = $this->getTagKey($tag);
+        return $this->get($name, []);
     }
 
     /**

@@ -51,6 +51,10 @@ Cache::dec('val',5);
 Cache::tag('tag_name')->set('val','value',600);
 // 删除某个标签下的缓存数据
 Cache::tag('tag_name')->clear();
+// 支持指定多个标签
+Cache::tag(['tag1','tag2'])->set('val2','value',600);
+// 删除多个标签下的缓存数据
+Cache::tag(['tag1','tag2'])->clear();
 
 // 使用多种缓存类型
 $redis = Cache::connect([
