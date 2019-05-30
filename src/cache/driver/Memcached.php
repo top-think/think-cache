@@ -31,7 +31,7 @@ class Memcached extends Driver
         'username'   => '', //账号
         'password'   => '', //密码
         'option'     => [],
-        'tag_prefix' => 'tag_',
+        'tag_prefix' => 'tag:',
         'serialize'  => [],
     ];
 

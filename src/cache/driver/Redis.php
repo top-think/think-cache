@@ -35,7 +35,7 @@ class Redis extends Driver
         'expire'     => 0,
         'persistent' => false,
         'prefix'     => '',
-        'tag_prefix' => 'tag_',
+        'tag_prefix' => 'tag:',
         'serialize'  => [],
     ];
 
