@@ -147,9 +147,9 @@ class File extends Driver
 
         $expire   = $this->getExpireTime($expire);
         $filename = $this->getCacheKey($name);
-        $data     = $this->serialize($value);
 
         $dir = dirname($filename);
+
         if (!is_dir($dir)) {
             try {
                 mkdir($dir, 0755, true);
@@ -157,6 +157,8 @@ class File extends Driver
                 // 创建失败
             }
         }
+
+        $data = $this->serialize($value);
 
         if ($this->options['data_compress'] && function_exists('gzcompress')) {
             //数据压缩

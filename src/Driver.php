@@ -12,9 +12,12 @@ declare (strict_types = 1);
 
 namespace think\cache;
 
-use InvalidArgumentException;
+use DateInterval;
+use DateTime;
+use DateTimeInterface;
 use Opis\Closure\SerializableClosure;
 use Psr\SimpleCache\CacheInterface;
+use think\cache\exception\InvalidArgumentException;
 use think\Container;
 
 /**
@@ -55,13 +58,17 @@ abstract class Driver implements CacheInterface
     /**
      * 获取有效期
      * @access protected
-     * @param  integer|\DateTimeInterface $expire 有效期
+     * @param  integer|DateTimeInterface|DateInterval $expire 有效期
      * @return int
      */
     protected function getExpireTime($expire): int
     {
-        if ($expire instanceof \DateTimeInterface) {
+        if ($expire instanceof DateTimeInterface) {
             $expire = $expire->getTimestamp() - time();
+        } elseif ($expire instanceof DateInterval) {
+            $expire = DateTime::createFromFormat('U', (string) time())
+                ->add($expire)
+                ->format('U') - time();
         }
 
         return (int) $expire;
@@ -198,11 +205,11 @@ abstract class Driver implements CacheInterface
 
     /**
      * 获取实际标签名
-     * @access protected
+     * @access public
      * @param  string $tag 标签名
      * @return string
      */
-    protected function getTagKey(string $tag): string
+    public function getTagKey(string $tag): string
     {
         return $this->options['tag_prefix'] . md5($tag);
     }

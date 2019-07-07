@@ -1,26 +1,37 @@
 # think-cache
 
-用于PHP缓存管理（PHP 7.1+）
+用于PHP缓存管理（PHP 7.1+），支持`PSR-6`及`PSR-16`缓存规范。
 
-安装
+## 安装
 ~~~
 composer require topthink/think-cache
 ~~~
 
-用法：
+## 用法：
 ~~~php
-use think\facade\Cache;
+use think\cache\facade\Cache;
 
-// 缓存初始化
-Cache::init([
-	// 驱动方式（支持file/memcache/redis/xcache/wincache）
-	'type'   => 'File',
-	// 缓存保存目录
-	//'path'   => './cache/',
-	// 缓存前缀
-	'prefix' => '',
-	// 缓存有效期 0表示永久缓存
-	'expire' => 0,
+// 缓存配置
+Cache::config([
+	'default'	=>	'file',
+	'stores'	=>	[
+		'file'	=>	[
+			'type'   => 'File',
+			// 缓存保存目录
+			'path'   => './cache/',
+			// 缓存前缀
+			'prefix' => '',
+			// 缓存有效期 0表示永久缓存
+			'expire' => 0,
+		],
+		'redis'	=>	[
+			'type'   => 'redis',
+			'host'   => '127.0.0.1',
+			'port'   => 6379,
+			'prefix' => '',
+			'expire' => 0,
+		],
+	],
 ]);
 // 设置缓存
 Cache::set('val','value',600);
@@ -57,16 +68,7 @@ Cache::tag(['tag1','tag2'])->set('val2','value',600);
 Cache::tag(['tag1','tag2'])->clear();
 
 // 使用多种缓存类型
-$redis = Cache::connect([
-	// 驱动方式（支持file/memcache/redis/xcache/wincache/sqlite）
-	'type'   => 'redis',
-	'host'   => '127.0.0.1',
-	'port'   => 6379,
-	// 缓存前缀
-	'prefix' => '',
-	// 缓存有效期 0表示永久缓存
-	'expire' => 0,
-]);
+$redis = Cache::store('redis');
 
 $redis->set('var','value',600);
 $redis->get('var');

@@ -29,6 +29,12 @@ class TagSet
      */
     protected $handler;
 
+    /**
+     * 架构函数
+     * @access public
+     * @param  array  $tag 缓存标签
+     * @param  Driver $cache 缓存对象
+     */
     public function __construct(array $tag, Driver $cache)
     {
         $this->tag     = $tag;
@@ -113,7 +119,7 @@ class TagSet
     {
         // 指定标签清除
         foreach ($this->tag as $tag) {
-            $names = $this->handler->getTagItems($tag);
+            $names = $this->handler->get($tag, []);
 
             $this->handler->clearTag($names);
             $this->handler->delete($tag);
