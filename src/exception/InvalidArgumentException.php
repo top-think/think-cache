@@ -2,14 +2,14 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006-2016 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006-2019 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
-// | Author: yunwuxin <448901948@qq.com>
+// | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
-
-namespace think\cache\exception;
+declare (strict_types = 1);
+namespace think\exception;
 
 use Psr\Cache\InvalidArgumentException as Psr6CacheInvalidArgumentInterface;
 use Psr\SimpleCache\InvalidArgumentException as SimpleCacheInvalidArgumentInterface;
