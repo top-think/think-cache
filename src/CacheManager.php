@@ -14,6 +14,7 @@ namespace think;
 
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use think\cache\Driver;
 use think\Container;
 use think\exception\InvalidArgumentException;
 
@@ -48,12 +49,12 @@ class CacheManager implements CacheItemPoolInterface
     protected $config = [];
 
     /**
-     * 架构函数
+     * 初始化
      * @access public
-     * @param  array $config  配置参数
+     * @param  array $config 配置参数
      * @return void
      */
-    public function __construct(array $config = [])
+    public function init(array $config = [])
     {
         $this->config = $config;
     }
