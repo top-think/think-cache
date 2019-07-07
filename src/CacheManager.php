@@ -10,12 +10,12 @@
 // +----------------------------------------------------------------------
 declare (strict_types = 1);
 
-namespace think\cache;
+namespace think;
 
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
-use think\cache\exception\InvalidArgumentException;
 use think\Container;
+use think\exception\InvalidArgumentException;
 
 /**
  * 缓存管理类

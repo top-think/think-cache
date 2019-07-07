@@ -9,13 +9,13 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
-namespace think\cache\facade;
+namespace think\facade;
 
 use think\Facade;
 
 /**
- * @see \think\cache\CacheManager
- * @mixin \think\cache\CacheManager
+ * @see \think\CacheManager
+ * @mixin \think\CacheManager
  */
 class Cache extends Facade
 {
@@ -26,6 +26,6 @@ class Cache extends Facade
      */
     protected static function getFacadeClass()
     {
-        return 'think\cache\CacheManager';
+        return 'think\CacheManager';
     }
 }

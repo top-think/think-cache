@@ -9,7 +9,7 @@ composer require topthink/think-cache
 
 ## 用法：
 ~~~php
-use think\cache\facade\Cache;
+use think\facade\Cache;
 
 // 缓存配置
 Cache::config([

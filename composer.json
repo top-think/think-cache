@@ -17,7 +17,7 @@
     },
     "autoload": {
         "psr-4": {
-            "think\\cache\\": "src"
+            "think\\": "src"
         },
         "files": []
     }
