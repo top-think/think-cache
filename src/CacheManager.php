@@ -52,11 +52,12 @@ class CacheManager implements CacheItemPoolInterface
      * 初始化
      * @access public
      * @param  array $config 配置参数
-     * @return void
+     * @return $this
      */
     public function init(array $config = [])
     {
         $this->config = $config;
+        return $this;
     }
 
     /**
