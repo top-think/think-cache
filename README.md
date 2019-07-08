@@ -73,3 +73,5 @@ $redis = Cache::store('redis');
 $redis->set('var','value',600);
 $redis->get('var');
 ~~~
+
+更多内容可以参考 https://www.kancloud.cn/manual/thinkphp6_0/1037634
