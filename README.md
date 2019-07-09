@@ -2,6 +2,16 @@
 
 用于PHP缓存管理（PHP 7.1+），支持`PSR-6`及`PSR-16`缓存规范。
 
+主要特性包括：
+
+* 支持多缓存通道设置及切换
+* 支持缓存数据递增/递减
+* 支持门面调用
+* 内置File/Redis/Memcache/Memcached/Wincache
+* 支持缓存标签
+* 支持闭包数据
+* 支持`PSR-6`及`PSR-16`缓存规范
+
 ## 安装
 ~~~
 composer require topthink/think-cache
