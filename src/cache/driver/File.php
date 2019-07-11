@@ -13,6 +13,7 @@ declare (strict_types = 1);
 namespace think\cache\driver;
 
 use think\cache\Driver;
+use think\Container;
 
 /**
  * 文件缓存类
@@ -46,12 +47,18 @@ class File extends Driver
      */
     public function __construct(array $options = [])
     {
+        $DS = DIRECTORY_SEPARATOR;
+
         if (!empty($options)) {
             $this->options = array_merge($this->options, $options);
         }
 
-        if (substr($this->options['path'], -1) != DIRECTORY_SEPARATOR) {
-            $this->options['path'] .= DIRECTORY_SEPARATOR;
+        if (!$this->options['path']) {
+            $this->options['path'] = Container::getInstance()->has('app')
+                ? Container::getInstance()->get('app')->getRuntimePath()
+                : dirname(dirname(dirname(__DIR__))) . $DS . 'runtime' . $DS;
+        }else if (substr($this->options['path'], -1) != $DS) {
+            $this->options['path'] .= $DS;
         }
     }
 
