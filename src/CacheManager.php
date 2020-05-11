@@ -17,6 +17,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use think\cache\Driver;
 use think\Container;
 use think\exception\InvalidArgumentException;
+use think\cache\CacheItem;
 
 /**
  * 缓存管理类
