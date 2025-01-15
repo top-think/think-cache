@@ -2,16 +2,20 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2019 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2025 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
+declare (strict_types = 1);
 
 namespace think\cache\driver;
 
+use DateInterval;
+use DateTimeInterface;
 use think\cache\Driver;
+use think\exception\InvalidCacheException;
 
 /**
  * Memcached缓存类
@@ -23,22 +27,23 @@ class Memcached extends Driver
      * @var array
      */
     protected $options = [
-        'host'       => '127.0.0.1',
-        'port'       => 11211,
-        'expire'     => 0,
-        'timeout'    => 0, // 超时时间（单位：毫秒）
-        'prefix'     => '',
-        'username'   => '', //账号
-        'password'   => '', //密码
-        'option'     => [],
-        'tag_prefix' => 'tag:',
-        'serialize'  => [],
+        'host'        => '127.0.0.1',
+        'port'        => 11211,
+        'expire'      => 0,
+        'timeout'     => 0,
+        'prefix'      => '',
+        'option'      => [],
+        'username'    => '',
+        'password'    => '',
+        'tag_prefix'  => 'tag:',
+        'serialize'   => [],
+        'fail_delete' => false,
     ];
 
     /**
      * 架构函数
      * @access public
-     * @param  array $options 缓存参数
+     * @param array $options 缓存参数
      */
     public function __construct(array $options = [])
     {
@@ -85,7 +90,7 @@ class Memcached extends Driver
     /**
      * 判断缓存
      * @access public
-     * @param  string $name 缓存变量名
+     * @param string $name 缓存变量名
      * @return bool
      */
     public function has($name): bool
@@ -98,31 +103,30 @@ class Memcached extends Driver
     /**
      * 读取缓存
      * @access public
-     * @param  string $name 缓存变量名
-     * @param  mixed  $default 默认值
+     * @param string $name    缓存变量名
+     * @param mixed  $default 默认值
      * @return mixed
      */
-    public function get($name, $default = null)
+    public function get($name, $default = null): mixed
     {
-        $this->readTimes++;
-
         $result = $this->handler->get($this->getCacheKey($name));
-
-        return false !== $result ? $this->unserialize($result) : $default;
+        try {
+            return false !== $result ? $this->unserialize($result) : $this->getDefaultValue($name, $default);
+        } catch (InvalidCacheException $e) {
+            return $this->getDefaultValue($name, $default, true);
+        }
     }
 
     /**
      * 写入缓存
      * @access public
-     * @param  string            $name 缓存变量名
-     * @param  mixed             $value  存储数据
-     * @param  integer|\DateTime $expire  有效时间（秒）
+     * @param string                                 $name   缓存变量名
+     * @param mixed                                  $value  存储数据
+     * @param integer|DateInterval|DateTimeInterface $expire 有效时间（秒）
      * @return bool
      */
     public function set($name, $value, $expire = null): bool
     {
-        $this->writeTimes++;
-
         if (is_null($expire)) {
             $expire = $this->options['expire'];
         }
@@ -141,14 +145,12 @@ class Memcached extends Driver
     /**
      * 自增缓存（针对数值缓存）
      * @access public
-     * @param  string $name 缓存变量名
-     * @param  int    $step 步长
+     * @param string $name 缓存变量名
+     * @param int    $step 步长
      * @return false|int
      */
-    public function inc(string $name, int $step = 1)
+    public function inc($name, $step = 1)
     {
-        $this->writeTimes++;
-
         $key = $this->getCacheKey($name);
 
         if ($this->handler->get($key)) {
@@ -161,14 +163,12 @@ class Memcached extends Driver
     /**
      * 自减缓存（针对数值缓存）
      * @access public
-     * @param  string $name 缓存变量名
-     * @param  int    $step 步长
+     * @param string $name 缓存变量名
+     * @param int    $step 步长
      * @return false|int
      */
-    public function dec(string $name, int $step = 1)
+    public function dec($name, $step = 1)
     {
-        $this->writeTimes++;
-
         $key   = $this->getCacheKey($name);
         $value = $this->handler->get($key) - $step;
         $res   = $this->handler->set($key, $value);
@@ -179,14 +179,12 @@ class Memcached extends Driver
     /**
      * 删除缓存
      * @access public
-     * @param  string       $name 缓存变量名
-     * @param  bool|false   $ttl
+     * @param string     $name 缓存变量名
+     * @param bool|false $ttl
      * @return bool
      */
     public function delete($name, $ttl = false): bool
     {
-        $this->writeTimes++;
-
         $key = $this->getCacheKey($name);
 
         return false === $ttl ?
@@ -201,20 +199,17 @@ class Memcached extends Driver
      */
     public function clear(): bool
     {
-        $this->writeTimes++;
-
         return $this->handler->flush();
     }
 
     /**
      * 删除缓存标签
      * @access public
-     * @param  array $keys 缓存标识列表
+     * @param array $keys 缓存标识列表
      * @return void
      */
-    public function clearTag(array $keys): void
+    public function clearTag($keys): void
     {
         $this->handler->deleteMulti($keys);
     }
-
 }
