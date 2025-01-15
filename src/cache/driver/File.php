@@ -40,10 +40,9 @@ class File extends Driver
 
     /**
      * 架构函数
-     * @param App   $app
      * @param array $options 参数
      */
-    public function __construct(App $app, array $options = [])
+    public function __construct(array $options = [])
     {
         if (!empty($options)) {
             $this->options = array_merge($this->options, $options);
