@@ -18,6 +18,7 @@ use DateTime;
 use DateTimeInterface;
 use Exception;
 use think\Container;
+use think\contract\CacheHandlerInterface;
 use think\exception\InvalidArgumentException;
 use think\exception\InvalidCacheException;
 use Throwable;
@@ -25,7 +26,7 @@ use Throwable;
 /**
  * 缓存基础类
  */
-abstract class Driver
+abstract class Driver implements CacheHandlerInterface
 {
     /**
      * 驱动句柄

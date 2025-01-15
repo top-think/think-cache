@@ -17,6 +17,8 @@
         "psr-4": {
             "think\\": "src"
         },
-        "files": []
+        "files": [
+            "src/helper.php"
+        ]
     }
 }
